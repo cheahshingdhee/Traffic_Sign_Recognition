@@ -10,9 +10,10 @@ import matplotlib.pyplot as plt
 
 
 def getEmptyPic(height, width):
-    return np.zeros((height,width,3), np.uint8)
+    return np.zeros((height,width,1), np.uint8)
 
 def red_blue_normalize(height,width,img):
+    results=getEmptyPic(height,width)
     for x in range(height):
         for y in range(width):
             r=img[x,y,2]
@@ -89,6 +90,20 @@ def Countour(imgCanny,height,width,img_cpy):
     return draw,img_cpy
 
 
+def colorCLAHE(img):
+    lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+
+    lab_planes = cv2.split(lab)
+
+    clahe = cv2.createCLAHE(clipLimit=2.1, tileGridSize=(8, 8))
+
+    lab_planes[0] = clahe.apply(lab_planes[0])
+
+    lab = cv2.merge(lab_planes)
+
+    img = cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
+    return img
+
 cap=cv2.VideoCapture(0)
 cap.set(3,500)
 cap.set(4,500)
@@ -104,20 +119,12 @@ for x in range(100):
     cv2.imshow("Original image", img)
     height, width, channels = img.shape
     results = getEmptyPic(height, width)  # to store the results of red/blue-normalization
-    #results=red_blue_normalize(height,width,img)
-    img_yuv = cv2.cvtColor(img, cv2.COLOR_BGR2YUV)
-
-    # equalize the histogram of the Y channel
-    img_yuv[:, :, 0] = cv2.equalizeHist(img_yuv[:, :, 0])
-
-    # convert the YUV image back to RGB format
-    img = cv2.cvtColor(img_yuv, cv2.COLOR_YUV2BGR)
-
+    img = colorCLAHE(img)
     img=cv2.GaussianBlur(img,(13,13),sigmaX=1,sigmaY=1)
 
-    results = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
+    cv2.imshow("HSV results", img)
 
-    #cv2.imshow("HSV results", results)
+    results = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
 
     lower_g = np.array([36, 25, 25])
     upper_g = np.array([86, 255, 255])
@@ -125,21 +132,21 @@ for x in range(100):
     mask5 = cv2.bitwise_not(mask5)
     #cv2.imshow("Mask5", mask5)
     #red color segmentation
-    lower_r =np.array([160,120,20])
+    lower_r =np.array([165,110,50])
     upper_r= np.array([179,255,255])
     mask=cv2.inRange(results,lower_r,upper_r)
     #cv2.imshow("HSV",results)
     mask=mask&mask5
 
-    #cv2.imshow("Mask1",mask)
+    cv2.imshow("Mask1",mask)
 
-    lower_r2 = np.array([0, 120, 20])
-    upper_r2 = np.array([10, 255, 255])
+    lower_r2 = np.array([0, 110, 50])
+    upper_r2 = np.array([15, 255, 255])
     mask1 = cv2.inRange(results, lower_r2, upper_r2)
 
     mask1=mask1&mask5
 
-    #cv2.imshow("Mask2", mask1)
+    cv2.imshow("Mask2", mask1)
 
     #blue color segmentation
     lower_b = np.array([100, 100, 20])
@@ -147,7 +154,7 @@ for x in range(100):
     mask2 = cv2.inRange(results, lower_b, upper_b)
     mask2=mask2&mask5
 
-    #cv2.imshow("Mask3", mask2)
+    cv2.imshow("Mask3", mask2)
 
     #yellow color segmentation
     #lower_y = np.array([20, 100, 20])
@@ -156,7 +163,7 @@ for x in range(100):
     upper_y = np.array([30, 255, 255])
     mask4 = cv2.inRange(results, lower_y, upper_y)
     mask4=mask4&mask5
-    #cv2.imshow("Mask4", mask4)
+    cv2.imshow("Mask4", mask4)
 
 
 
@@ -180,7 +187,7 @@ for x in range(100):
     Final_2=cv2.bitwise_or(mask2,mask4)
     Final=cv2.bitwise_or(red_thrs,Final_2)
     x=cv2.Canny(Final,200,300,apertureSize=7, L2gradient = True)
-    #cv2.imshow("Combine",x)
+    cv2.imshow("Combine",x)
     cv2.imshow("Combine2",img_cpy)
 
 
