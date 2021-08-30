@@ -103,6 +103,23 @@ def colorCLAHE(img):
 
     img = cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
     return img
+def r_normalize(img):
+    img = img.astype(np.float32)
+    deno = np.sum(img, axis=2)
+    deno += 10e-8
+    mole = np.minimum(img[..., 2]-img[..., 0], img[..., 2]-img[..., 1])
+    C = np.maximum(0, mole/deno)
+    return (C*255).astype(np.uint8)
+
+
+def b_normalize(img):
+    img = img.astype(np.float32)
+    deno = np.sum(img, axis=2)
+    deno += 10e-8
+    mole = img[..., 0] - img[..., 2]
+    C = np.maximum(0, mole/deno)
+    return (C*255).astype(np.uint8)
+
 
 cap=cv2.VideoCapture(0)
 cap.set(3,500)
@@ -113,6 +130,8 @@ cap.set(4,500)
 for x in range(100):
     x=x+59
     img=cv2.imread("Img/t{:d}.png".format(x+1))
+    #img_r = r_normalize(img)
+    #img_b = b_normalize(img)
     img=cv2.resize(img,(500,500))
     #success,img = cap.read()
     img_cpy=img.copy()
@@ -121,6 +140,7 @@ for x in range(100):
     results = getEmptyPic(height, width)  # to store the results of red/blue-normalization
     img = colorCLAHE(img)
     img=cv2.GaussianBlur(img,(13,13),sigmaX=1,sigmaY=1)
+    #img = cv2.fastNlMeansDenoisingColored(img, None, 10, 10, 7, 21)
 
     cv2.imshow("HSV results", img)
 
@@ -132,7 +152,7 @@ for x in range(100):
     mask5 = cv2.bitwise_not(mask5)
     #cv2.imshow("Mask5", mask5)
     #red color segmentation
-    lower_r =np.array([165,110,50])
+    lower_r =np.array([165,130,50])
     upper_r= np.array([179,255,255])
     mask=cv2.inRange(results,lower_r,upper_r)
     #cv2.imshow("HSV",results)
@@ -140,8 +160,8 @@ for x in range(100):
 
     cv2.imshow("Mask1",mask)
 
-    lower_r2 = np.array([0, 110, 50])
-    upper_r2 = np.array([15, 255, 255])
+    lower_r2 = np.array([0, 130, 50])
+    upper_r2 = np.array([10, 255, 255])
     mask1 = cv2.inRange(results, lower_r2, upper_r2)
 
     mask1=mask1&mask5
@@ -198,8 +218,8 @@ for x in range(100):
     #cv2.imshow('MSER-blue', MSER_blue)
     #cv2.imshow('MSER-yellow', MSER_yellow)
 
-    # if cv2.waitKey(1) & 0xFF==ord('q'):
-    #     break
+    #if cv2.waitKey(1) & 0xFF==ord('q'):
+    #    break
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
