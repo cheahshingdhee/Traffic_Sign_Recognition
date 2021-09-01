@@ -1,0 +1,97 @@
+import os
+import numpy as np
+from keras.models import Sequential
+from keras.layers import Dense
+from tensorflow.keras.optimizers import Adam
+import pickle
+from keras.utils.np_utils import to_categorical
+from keras.layers import Dropout
+from keras.layers import Flatten
+from keras.layers.convolutional import Conv2D ,MaxPooling2D
+import cv2
+from sklearn.model_selection import train_test_split
+import pandas as pd
+import random
+import matplotlib.pyplot as plt
+from keras.preprocessing.image import  ImageDataGenerator
+from skimage.io import imread
+from skimage.transform import resize
+from skimage.feature import hog
+from skimage import exposure
+import matplotlib.pyplot as plt
+from sklearn import svm
+from sklearn.metrics import classification_report,accuracy_score
+
+print("done")
+
+def colorCLAHE(img):
+    lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+
+    lab_planes = cv2.split(lab)
+
+    clahe = cv2.createCLAHE(clipLimit=2.1, tileGridSize=(8, 8))
+
+    lab_planes[0] = clahe.apply(lab_planes[0])
+
+    lab = cv2.merge(lab_planes)
+
+    img = cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
+    return img
+
+def HOG(img):
+    fd, hog_image = hog(img, orientations=9, pixels_per_cell=(8, 8),cells_per_block=(2, 2), visualize=True, multichannel=True,)
+    return hog_image,fd
+
+
+path="SegmentationResult"
+
+count=0
+images=[]
+classNo=[]
+myList = os.listdir(path)
+print("Total class detected : ",len(myList))
+
+noOfClasses=len(myList)
+for x in range(0,len(myList)):
+    myPicList=os.listdir(path+"/"+str(count))
+    for y in myPicList:
+        curImg=cv2.imread(path+"/"+str(count)+"/"+y)
+        curImg=cv2.resize(curImg,(64,128))
+        curImg,fd=HOG(curImg)
+        images.append(fd)
+        classNo.append(count)
+    print(count)
+    count +=1
+
+
+clf = svm.SVC(probability=True)
+
+hog_feature=np.array(images)
+hog_output=np.array(classNo).reshape(-1,1)
+print(hog_feature.shape)
+print(hog_output.shape)
+
+
+data_frame = np.hstack((hog_feature,hog_output))
+print(data_frame.shape)
+np.random.shuffle(data_frame)
+#What percentage of data you want to keep for training
+percentage = 75
+partition = int(len(hog_feature)*percentage/100)
+x_train, x_test = data_frame[:partition,:-1],  data_frame[partition:,:-1]
+y_train, y_test = data_frame[:partition,-1:].ravel() , data_frame[partition:,-1:].ravel()
+
+
+
+
+clf.fit(x_train,y_train)
+y_pred = clf.predict(x_test)
+print("Accuracy: "+str(accuracy_score(y_test, y_pred)))
+print('\n')
+print(classification_report(y_test, y_pred))
+
+from keras.models import load_model
+import pickle
+# save the model#
+with open('SVM_MODEL_SHAPE','wb') as f:
+    pickle.dump(clf,f)
