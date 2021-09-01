@@ -2,12 +2,12 @@
 
 OUR_GROUP_PROJECT_FILE
 ====================================
-traffic_sign_detection_module 
-Model_training - CNN model 
-SVM + HOG - SVM model 
+traffic_sign_detection_module.py [detection module]
+Model_training.py[CNN model-classification module] 
+SVM+HOG.py [SVM model-classification module] 
 
 
 Extra file for my own ref (not important)
 ===================================
-opencv1
-color 
+opencv1.py
+color.py 
