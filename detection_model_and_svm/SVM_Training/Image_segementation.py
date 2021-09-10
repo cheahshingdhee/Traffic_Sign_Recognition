@@ -163,7 +163,7 @@ def Img_segmentation(img,height,width):
     return img1_bg1,img1_bg2,img1_bg3,img1_bg4
 
 
-for x in (glob.glob("segmentation_dataset/*.*")):
+for x in (glob.glob("segmentation_data/*.*")):
     img = cv2.imread(x)
     cv2.imshow("orginal",img)
     height, width, channels = img.shape
