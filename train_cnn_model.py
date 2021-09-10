@@ -14,12 +14,18 @@ from tensorflow.keras.optimizers import Adam
 from utility import preprocess
 
 # Define constant
-DATASET_PATH = "dataset"
 CATEGORIES = ["non-stopping", "60_speed_limit", "no_entry", "give_way", "stop", "straight_or_right", "roundabout",
               "traffic_light", "invalid_type"]
+
+DATASET_PATH = "dataset"
 IMAGE_DIMENSIONS = (32, 32, 3)
+
 TESTING_SIZE = 0.2
 VALIDATION_SIZE = 0.2
+
+LEARNING_RATE = 1e-3
+EPOCHS = 30
+BATCH_SIZE = 20
 
 # Load the images
 print("[INFO] Start to load the images...")
@@ -69,7 +75,7 @@ dataGen = ImageDataGenerator(width_shift_range=0.1, height_shift_range=0.1,
                              shear_range=0.1,
                              rotation_range=10)
 dataGen.fit(X_train)
-batches = dataGen.flow(X_train, y_train, batch_size=20)
+batches = dataGen.flow(X_train, y_train, batch_size=BATCH_SIZE)
 X_batch, y_batch = next(batches)
 
 y_train = to_categorical(y_train, noOfClasses)
@@ -95,7 +101,7 @@ def CNNmodel():
     model.add(Dropout(0.5))  # set dropout-rate as 0.5
     model.add(Dense(noOfClasses, activation='softmax'))
 
-    model.compile(Adam(learning_rate=0.001), metrics=['accuracy'], loss='categorical_crossentropy')
+    model.compile(Adam(learning_rate=LEARNING_RATE), metrics=['accuracy'], loss='categorical_crossentropy')
     return model
 
 
@@ -103,7 +109,7 @@ def CNNmodel():
 
 model = CNNmodel()
 print(model.summary())
-history = model.fit(dataGen.flow(X_train, y_train, batch_size=20), epochs=30,
+history = model.fit(dataGen.flow(X_train, y_train, batch_size=BATCH_SIZE), epochs=EPOCHS,
                     validation_data=(X_validation, y_validation))
 
 # Plot graphs
