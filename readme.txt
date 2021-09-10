@@ -17,13 +17,11 @@ Step 5: Test the classifier with model by running
 python traffic_sign_classifier.py
 
 
-Extra 1: Test the detection classification in real time
-python traffic_sign_detection_classification_real_time_webcam.py
 
-Extra 2: Train the model with CNN
+Extra 1: Train the model with CNN
 python train_cnn_model.py
 
-Extra 3:
+Extra 2:
 cd detection_model_and_svm
 cd SVM_Training
 python Image_segementation.py
@@ -33,6 +31,8 @@ cd Traffic_Detection_related_module
 python Traffic_sign_detection_Classification_final.py
 python Traffic_Sign_Detection_Final.py
 
+Extra 3: Test the detection classification in real time
+python traffic_sign_detection_classification_real_time_webcam.py
 
 Information:
 Graph images will save in results folder.
