@@ -11,11 +11,29 @@ python -m venv .venv
 Step 3: Install required packages with following command
 pip install -r requirements.txt
 
-Step 4: Test the detector with model by running
-python traffic_sign_detector.py
+Step 4: Please place all test data/image into 'test_data' folder and key in the file name into inputSignNames.txt.
 
+Step 5: Test the classifier with model by running
+python traffic_sign_classifier.py
+
+
+Extra 1: Test the detection classification in real time
+python traffic_sign_detection_classification_real_time_webcam.py
+
+Extra 2: Train the model with CNN
+python train_cnn_model.py
+
+Extra 3:
+cd detection_model_and_svm
+cd SVM_Training
+python Image_segementation.py
+python SVM_training.py
+cd ..
+cd Traffic_Detection_related_module
+python Traffic_sign_detection_Classification_final.py
+python Traffic_Sign_Detection_Final.py
+
+
+Information:
 Graph images will save in results folder.
 Model trained will save in model folder.
-
-Please place all test data into 'test_data' folder.
-
