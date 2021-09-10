@@ -166,7 +166,7 @@ plt.title('Multiclass ROC curve')
 plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive rate')
 plt.legend(loc='best')
-plt.savefig('Multiclass ROC', dpi=300)
+plt.savefig('graphs/Multiclass ROC', dpi=300)
 plt.show()
 
 # plot Precision vs Recall Curve
@@ -180,7 +180,7 @@ plt.xlabel("recall")
 plt.ylabel("precision")
 plt.legend(loc="best")
 plt.title("precision vs. recall curve")
-plt.savefig('Precision vs Recall', dpi=300)
+plt.savefig('graphs/Precision vs Recall', dpi=300)
 plt.show()
 
 # Save the model
