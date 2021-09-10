@@ -64,64 +64,66 @@ X_test = X_test.reshape(X_test.shape[0], X_test.shape[1], X_test.shape[2], 1)
 print("[INFO] Data preprocess completed.")
 
 ############################### Data Augmentation########################
-dataGen=ImageDataGenerator(width_shift_range=0.1,height_shift_range=0.1,
-                           zoom_range=0.2,
-                           shear_range=0.1,
-                           rotation_range=10)
+dataGen = ImageDataGenerator(width_shift_range=0.1, height_shift_range=0.1,
+                             zoom_range=0.2,
+                             shear_range=0.1,
+                             rotation_range=10)
 dataGen.fit(X_train)
-batches=dataGen.flow(X_train,y_train,batch_size=20)
-X_batch,y_batch=next(batches)
+batches = dataGen.flow(X_train, y_train, batch_size=20)
+X_batch, y_batch = next(batches)
 
-y_train=to_categorical(y_train,noOfClasses)
-y_validation=to_categorical(y_validation,noOfClasses)
-y_test=to_categorical(y_test,noOfClasses)
+y_train = to_categorical(y_train, noOfClasses)
+y_validation = to_categorical(y_validation, noOfClasses)
+y_test = to_categorical(y_test, noOfClasses)
+
 
 ############## CNN Construction ######################
 def CNNmodel():
-
-    size_of_pool=(2,2)
-    model=Sequential()
-    model.add((Conv2D(32,(3,3),input_shape=(IMAGE_DIMENSIONS[0],IMAGE_DIMENSIONS[1],1),activation='relu'))) #32 filters
+    size_of_pool = (2, 2)
+    model = Sequential()
+    model.add((Conv2D(32, (3, 3), input_shape=(IMAGE_DIMENSIONS[0], IMAGE_DIMENSIONS[1], 1),
+                      activation='relu')))  # 32 filters
     model.add(MaxPooling2D(pool_size=size_of_pool))
 
-    model.add((Conv2D(64, (3, 3), input_shape=(IMAGE_DIMENSIONS[0], IMAGE_DIMENSIONS[1], 1), activation='relu'))) #64 filters
+    model.add((Conv2D(64, (3, 3), input_shape=(IMAGE_DIMENSIONS[0], IMAGE_DIMENSIONS[1], 1),
+                      activation='relu')))  # 64 filters
     model.add(MaxPooling2D(pool_size=size_of_pool))
-    model.add(Dropout(0.5))  #set dropout-rate as 0.5
+    model.add(Dropout(0.5))  # set dropout-rate as 0.5
 
     model.add(Flatten())
-    model.add(Dense(64,activation='relu'))
-    model.add(Dropout(0.5)) #set dropout-rate as 0.5
-    model.add(Dense(noOfClasses,activation='softmax'))
+    model.add(Dense(64, activation='relu'))
+    model.add(Dropout(0.5))  # set dropout-rate as 0.5
+    model.add(Dense(noOfClasses, activation='softmax'))
 
-    model.compile(Adam(learning_rate=0.001),metrics=['accuracy'],loss='categorical_crossentropy')
+    model.compile(Adam(learning_rate=0.001), metrics=['accuracy'], loss='categorical_crossentropy')
     return model
 
 
 ########## TRAIN ##################
 
-model= CNNmodel()
+model = CNNmodel()
 print(model.summary())
-history=model.fit(dataGen.flow(X_train,y_train,batch_size=20),epochs=30,validation_data=(X_validation,y_validation))
+history = model.fit(dataGen.flow(X_train, y_train, batch_size=20), epochs=30,
+                    validation_data=(X_validation, y_validation))
 
-
-## plot graphs
+# Plot graphs
 plt.figure(1)
 plt.plot(history.history['loss'])
 plt.plot(history.history['val_loss'])
-plt.legend(['training','valdation'])
+plt.legend(['training', 'validation'])
 plt.title('loss')
 plt.xlabel('epoch')
 plt.figure(2)
 plt.plot(history.history['accuracy'])
 plt.plot(history.history['val_accuracy'])
-plt.legend(['training','valdation'])
+plt.legend(['training', 'validation'])
 plt.title('accuracy')
 plt.xlabel('epoch')
 plt.show()
 
-score=model.evaluate(X_test,y_test,verbose=0)
-print("Test score ",score[0])
-print("Test Accuaracy",score[1])
+score = model.evaluate(X_test, y_test, verbose=0)
+print("Test score ", score[0])
+print("Test Accuracy", score[1])
 
 y_pred = []
 Pred = model.predict(X_test, verbose=0)
@@ -131,7 +133,7 @@ Pred_Label_p = np.max(Pred, axis=1)
 
 y_test = np.argmax(y_test, axis=1)
 
-print(y_test.shape, Pred_Label.shape,Pred_Label_p.shape)
+print(y_test.shape, Pred_Label.shape, Pred_Label_p.shape)
 print(Pred_Label[1])
 print(Pred_Label_p[1])
 
@@ -146,9 +148,9 @@ print('Accuracy: %f' % accuracy)
 n_class = 9
 fpr = {}
 tpr = {}
-thresh ={}
+thresh = {}
 for i in range(n_class):
-    fpr[i], tpr[i], thresh[i] = roc_curve(y_test, Pred[:, i],pos_label=i)
+    fpr[i], tpr[i], thresh[i] = roc_curve(y_test, Pred[:, i], pos_label=i)
 
 # plot ROC Curve
 plt.plot(fpr[0], tpr[0], linestyle='--', color='orange', label='Class 0 vs Rest')
@@ -171,7 +173,7 @@ plt.show()
 precision = dict()
 recall = dict()
 for i in range(n_class):
-    precision[i], recall[i], _ = precision_recall_curve(y_test, Pred[:, i],pos_label=i)
+    precision[i], recall[i], _ = precision_recall_curve(y_test, Pred[:, i], pos_label=i)
     plt.plot(recall[i], precision[i], lw=2, label='class {}'.format(i))
 
 plt.xlabel("recall")
@@ -181,5 +183,5 @@ plt.title("precision vs. recall curve")
 plt.savefig('Precision vs Recall', dpi=300)
 plt.show()
 
-#save the model
-model.save('CNN_model.h5')  # creates a HDF5 file 'CNN_model.h5'
+# Save the model
+model.save('model/CNN_model.h5')  # creates a HDF5 file 'CNN_model.h5'
