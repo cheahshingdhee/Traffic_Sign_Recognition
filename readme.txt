@@ -11,11 +11,9 @@ python -m venv .venv
 Step 3: Install required packages with following command
 pip install -r requirements.txt
 
-Step 4: Download the dataset and extract into the project primary folder.
+Step 4: Please place all test data/image into 'test_data' folder and key in the file name into inputSignNames.txt.
 
-Step 5: Please place all test data/image into 'test_data' folder and key in the file name into inputSignNames.txt.
-
-Step 6: Test the classifier with model by running
+Step 5: Test the classifier with model by running
 python traffic_sign_classifier.py
 
 
