@@ -3,7 +3,7 @@ Python Interpreter - Python 3.7
 Instruction to run the program:
 Step 1: Make sure you have Python 3.7 installed in your system.
 
-Step 2: Create a virtual environment for this project.
+Step 2: Create a virtual environment and activate the environment for this project.
 Open Command Prompt with current directory, and key in several command below:
 python -m venv .venv
 .venv\Scripts\activate.bat
